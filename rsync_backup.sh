@@ -47,7 +47,7 @@ PERMS_DIR=755
 PERMS_FILE=644
 
 RSYNC_OPTS="-a --delete -v"
-date
+echo "START == $(date)"
 
 # Create the rotation directories if they don't exist.
 if [ ! -d $BACKUP_PATH ] ; then
@@ -77,6 +77,7 @@ fi
 
 
 # Rotate backups.
+echo " Rotate == $(date)"
 rm -rf $BACKUP_PATH/$SOURCE_BASE.6
 mv     $BACKUP_PATH/$SOURCE_BASE.5 $BACKUP_PATH/$SOURCE_BASE.6
 mv     $BACKUP_PATH/$SOURCE_BASE.4 $BACKUP_PATH/$SOURCE_BASE.5
@@ -85,7 +86,9 @@ mv     $BACKUP_PATH/$SOURCE_BASE.2 $BACKUP_PATH/$SOURCE_BASE.3
 mv     $BACKUP_PATH/$SOURCE_BASE.1 $BACKUP_PATH/$SOURCE_BASE.2
 cp -al $BACKUP_PATH/$SOURCE_BASE.0 $BACKUP_PATH/$SOURCE_BASE.1
 
+
 # Backup.
+echo " Backup == $(date)"
 rsync $RSYNC_OPTS $SOURCE_PATH/. $BACKUP_PATH/$SOURCE_BASE.0/.
 RSYNC_EXIT_STATUS=$?
 
@@ -105,6 +108,7 @@ else # Create a timestamp if there was an error.
     echo $RSYNC_EXIT_STATUS >> $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_ERROR
 fi
 
-date
+echo "END == $(date)"
+echo ""
 
 exit $RSYNC_EXIT_STATUS
