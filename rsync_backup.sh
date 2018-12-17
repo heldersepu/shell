@@ -1,11 +1,6 @@
 #!/bin/sh
 #
-# This maintains a one week rotating backup. This will normalize permissions on
-# all files and directories on backups. It has happened that someone removed
-# owner write permissions on some files, thus breaking the backup process. This
-# prevents that from happening. All this permission changing it tedious, but it
-# eliminates any doubts. I could have done this with "chmod -R +X", but I
-# wanted to explicitly set the permission bits.
+# This maintains a one week rotating backup. 
 #
 # Pass two arguments: rsync_backup SOURCE_PATH BACKUP_PATH
 #
