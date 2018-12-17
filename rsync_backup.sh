@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# This maintains a one week rotating backup. 
+# This maintains a one week rotating backup.
 #
 # Pass two arguments: rsync_backup SOURCE_PATH BACKUP_PATH
 #
@@ -39,49 +39,20 @@ fi
 
 SOURCE_BASE=`basename $SOURCE_PATH`
 RSYNC_OPTS="-a --delete -v"
+TIMESTAMP=$(date '+%F-%T')
 echo "START == $(date)"
 
-# Create the rotation directories if they don't exist.
+# Create the directories if they don't exist.
 if [ ! -d $BACKUP_PATH ] ; then
     mkdir $BACKUP_PATH
 fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.0 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.0
+if [ ! -d $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP ] ; then
+    mkdir $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP
 fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.1 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.1
-fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.2 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.2
-fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.3 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.3
-fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.4 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.4
-fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.5 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.5
-fi
-if [ ! -d $BACKUP_PATH/$SOURCE_BASE.6 ] ; then
-    mkdir $BACKUP_PATH/$SOURCE_BASE.6
-fi
-
-
-# Rotate backups.
-echo " Rotate == $(date)"
-rm -rf $BACKUP_PATH/$SOURCE_BASE.6
-mv     $BACKUP_PATH/$SOURCE_BASE.5 $BACKUP_PATH/$SOURCE_BASE.6
-mv     $BACKUP_PATH/$SOURCE_BASE.4 $BACKUP_PATH/$SOURCE_BASE.5
-mv     $BACKUP_PATH/$SOURCE_BASE.3 $BACKUP_PATH/$SOURCE_BASE.4
-mv     $BACKUP_PATH/$SOURCE_BASE.2 $BACKUP_PATH/$SOURCE_BASE.3
-mv     $BACKUP_PATH/$SOURCE_BASE.1 $BACKUP_PATH/$SOURCE_BASE.2
-cp -al $BACKUP_PATH/$SOURCE_BASE.0 $BACKUP_PATH/$SOURCE_BASE.1
-
 
 # Backup.
 echo " Backup == $(date)"
-rsync $RSYNC_OPTS $SOURCE_PATH/. $BACKUP_PATH/$SOURCE_BASE.0/.
+rsync $RSYNC_OPTS $SOURCE_PATH/. $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/.
 RSYNC_EXIT_STATUS=$?
 
 # Ignore error code 24, "rsync warning: some files vanished before they could be transferred".
@@ -91,13 +62,13 @@ fi
 
 # Create a timestamp file to show when backup process completed successfully.
 if [ $RSYNC_EXIT_STATUS = 0 ] ; then
-    rm -f $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_ERROR
-    date > $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_TIMESTAMP
+    rm -f $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_ERROR
+    date > $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_TIMESTAMP
 else # Create a timestamp if there was an error.
-    rm -f $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_TIMESTAMP
-    echo "rsync failed" > $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_ERROR
-    date >> $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_ERROR
-    echo $RSYNC_EXIT_STATUS >> $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_ERROR
+    rm -f $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_TIMESTAMP
+    echo "rsync failed" > $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_ERROR
+    date >> $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_ERROR
+    echo $RSYNC_EXIT_STATUS >> $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_ERROR
 fi
 
 echo "END == $(date)"
