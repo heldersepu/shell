@@ -71,6 +71,15 @@ else # Create a timestamp if there was an error.
     echo $RSYNC_EXIT_STATUS >> $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/BACKUP_ERROR
 fi
 
+#Delete old backups
+echo " Cleanup == $(date)"
+mkdir EMPTYDIR
+oldFolders=($(find $BACKUP_PATH -maxdepth 1 -mtime +7))
+for dFolder in "${oldFolders[@]}" ; do
+    rsync -a --delete EMPTYDIR/ $dFolder
+done
+rmdir EMPTYDIR
+
 echo "END == $(date)"
 echo ""
 
