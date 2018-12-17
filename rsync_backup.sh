@@ -43,9 +43,6 @@ if [ -z $BACKUP_PATH ] ; then
 fi
 
 SOURCE_BASE=`basename $SOURCE_PATH`
-PERMS_DIR=755
-PERMS_FILE=644
-
 RSYNC_OPTS="-a --delete -v"
 echo "START == $(date)"
 
