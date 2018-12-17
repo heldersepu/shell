@@ -17,15 +17,12 @@ usage() {
     echo "    BACKUP_PATH is usually a local directory where you want the"
     echo "    backup set stored."
     echo "    -v : set verbose mode"
-    echo "    -n : normalize directory and file permissions to 755 for dirs and 644 for files."
 }
 
 VERBOSE=0
-NORMALIZE_PERMS=0
 while getopts ":vnh" options; do
     case $options in
         v ) VERBOSE=1;;
-        n ) NORMALIZE_PERMS=1;;
         h ) usage
             exit 1;;
         \? ) usage
@@ -84,19 +81,8 @@ if [ ! -d $BACKUP_PATH/$SOURCE_BASE.6 ] ; then
     mkdir $BACKUP_PATH/$SOURCE_BASE.6
 fi
 
-# TODO All these find operations to clean up permissions is going to add a lot
-# of overhead as the backup set gets bigger. At 100 GB it's not a big deal. The
-# correct thing would be to have an exception based system where I correct
-# permissions when/if they cause a problem.
 
 # Rotate backups.
-if [ $NORMALIZE_PERMS ]; then
-    if [ $VERBOSE ]; then
-        echo "Normalizing file permissions."
-    fi
-    find $BACKUP_PATH/$SOURCE_BASE.6 -type d -exec chmod $PERMS_DIR {} \;
-    find $BACKUP_PATH/$SOURCE_BASE.6 -type f -exec chmod $PERMS_FILE {} \;
-fi
 rm -rf $BACKUP_PATH/$SOURCE_BASE.6
 mv     $BACKUP_PATH/$SOURCE_BASE.5 $BACKUP_PATH/$SOURCE_BASE.6
 mv     $BACKUP_PATH/$SOURCE_BASE.4 $BACKUP_PATH/$SOURCE_BASE.5
@@ -106,22 +92,8 @@ mv     $BACKUP_PATH/$SOURCE_BASE.1 $BACKUP_PATH/$SOURCE_BASE.2
 cp -al $BACKUP_PATH/$SOURCE_BASE.0 $BACKUP_PATH/$SOURCE_BASE.1
 
 # Backup.
-if [ $NORMALIZE_PERMS ]; then
-    if [ $VERBOSE ]; then
-        echo "Normalizing file permissions."
-    fi
-    find $BACKUP_PATH/$SOURCE_BASE.0 -type d -exec chmod $PERMS_DIR {} \;
-    find $BACKUP_PATH/$SOURCE_BASE.0 -type f -exec chmod $PERMS_FILE {} \;
-fi
 rsync $RSYNC_OPTS $SOURCE_PATH/. $BACKUP_PATH/$SOURCE_BASE.0/.
 RSYNC_EXIT_STATUS=$?
-if [ $NORMALIZE_PERMS ]; then
-    if [ $VERBOSE ]; then
-        echo "Normalizing file permissions."
-    fi
-    find $BACKUP_PATH/$SOURCE_BASE.0 -type d -exec chmod $PERMS_DIR {} \;
-    find $BACKUP_PATH/$SOURCE_BASE.0 -type f -exec chmod $PERMS_FILE {} \;
-fi
 
 # Ignore error code 24, "rsync warning: some files vanished before they could be transferred".
 if [ $RSYNC_EXIT_STATUS = 24 ] ; then
