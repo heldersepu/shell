@@ -16,13 +16,10 @@ usage() {
     echo "    SOURCE_PATH and BACKUP_PATH may be ssh-style remote paths; although,"
     echo "    BACKUP_PATH is usually a local directory where you want the"
     echo "    backup set stored."
-    echo "    -v : set verbose mode"
 }
 
-VERBOSE=0
 while getopts ":vnh" options; do
     case $options in
-        v ) VERBOSE=1;;
         h ) usage
             exit 1;;
         \? ) usage
@@ -48,12 +45,9 @@ fi
 SOURCE_BASE=`basename $SOURCE_PATH`
 PERMS_DIR=755
 PERMS_FILE=644
-if [ $VERBOSE ]; then
-    RSYNC_OPTS="-a --delete -v"
-    date
-else
-    RSYNC_OPTS="-a --delete -q"
-fi
+
+RSYNC_OPTS="-a --delete -v"
+date
 
 # Create the rotation directories if they don't exist.
 if [ ! -d $BACKUP_PATH ] ; then
@@ -111,8 +105,6 @@ else # Create a timestamp if there was an error.
     echo $RSYNC_EXIT_STATUS >> $BACKUP_PATH/$SOURCE_BASE.0/BACKUP_ERROR
 fi
 
-if [ $VERBOSE ]; then
-    date
-fi
+date
 
 exit $RSYNC_EXIT_STATUS
