@@ -38,7 +38,7 @@ if [ -z $BACKUP_PATH ] ; then
 fi
 
 SOURCE_BASE=`basename $SOURCE_PATH`
-RSYNC_OPTS="-a --delete -v"
+RSYNC_OPTS="-a --delete"
 TIMESTAMP=$(date '+%F-%T')
 echo "START == $(date)"
 
@@ -73,12 +73,13 @@ fi
 
 #Delete old backups
 echo " Cleanup == $(date)"
-mkdir EMPTYDIR
+mkdir EMPTYDIR.$TIMESTAMP
 oldFolders=($(find $BACKUP_PATH -maxdepth 1 -mtime +7))
 for dFolder in "${oldFolders[@]}" ; do
-    rsync -a --delete EMPTYDIR/ $dFolder
+    echo "   Removing ($dFolder) === $(date)"
+    rsync $RSYNC_OPTS EMPTYDIR.$TIMESTAMP/ $dFolder
 done
-rmdir EMPTYDIR
+rmdir EMPTYDIR.$TIMESTAMP
 
 echo "END == $(date)"
 echo ""
