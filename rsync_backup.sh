@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# This maintains a one week rotating backup.
+# This maintains a one week backup.
 #
 # Pass two arguments: rsync_backup SOURCE_PATH BACKUP_PATH
 #
-# $Id: rsync_backup 222 2008-02-21 22:05:30Z noah $
+
 
 usage() {
     echo "usage: rsync_backup [-v] [-n] SOURCE_PATH BACKUP_PATH"
