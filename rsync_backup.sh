@@ -52,7 +52,8 @@ fi
 
 # Backup.
 echo " Backup == $(date)"
-rsync $RSYNC_OPTS $SOURCE_PATH/. $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/.
+_thread_count=$(($(nproc --all) * 16))
+fpsync -n $_thread_count -v -o "-a --stats --numeric-ids --log-file=/tmp/efs-backup.log" $SOURCE_PATH/. $BACKUP_PATH/$SOURCE_BASE.$TIMESTAMP/. 1>/tmp/efs-fpsync.log
 RSYNC_EXIT_STATUS=$?
 
 # Ignore error code 24, "rsync warning: some files vanished before they could be transferred".
